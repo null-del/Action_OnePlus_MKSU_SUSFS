@@ -24,7 +24,7 @@ on:
         default: '6.1'
       KERNEL_NAME:
         description: "修改内核名称"
-        required: true
+        required: false
         default: '-android14-11-o-g1132d864665d'
       kernelsu_variant:
         description: "选择 KSU"
@@ -73,13 +73,17 @@ jobs:
 
       - name: Configure Git
         run: |
-         git config --global user.name "ychenxuan"
-         git config --global user.email "3494167979@qq.com"
+         git config --global user.name "null-del"
+         git config --global user.email "1872937982@qq.com"
 
       - name: Install dependencies
         run: |
          sudo apt update && sudo apt upgrade -y
          sudo apt install -y python3 git curl
+         dd if=/dev/zero of=/var/swap bs=1G count=32
+         mkswap /var/swap
+         swapon /var/swap
+         free -m
 
       - name: Install repo tool
         run: |
@@ -183,6 +187,10 @@ jobs:
           echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> ./common/arch/arm64/configs/gki_defconfig
 
+          # Add additional tmpfs config setting
+          echo "CONFIG_TMPFS_XATTR=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_TMPFS_POSIX_ACL=y" >> ./common/arch/arm64/configs/gki_defconfig
+         
           # Remove check_defconfig
           sed -i 's/check_defconfig//' ./common/build.config.gki
 
@@ -202,7 +210,7 @@ jobs:
         if: github.event.inputs.CPU != 'sm8650' 
         run: |
          cd kernel_workspace
-         LTO=thin ./kernel_platform/oplus/build/oplus_build_kernel.sh ${{ github.event.inputs.CPUD }} gki
+         LTO=full ./kernel_platform/oplus/build/oplus_build_kernel.sh ${{ github.event.inputs.CPUD }} gki
          
       - name: Make AnyKernel3
         run: |
