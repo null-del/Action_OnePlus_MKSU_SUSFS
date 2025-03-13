@@ -80,10 +80,10 @@ jobs:
         run: |
          sudo apt update && sudo apt upgrade -y
          sudo apt install -y python3 git curl
-         dd if=/dev/zero of=/var/swap bs=1G count=32
-         mkswap /var/swap
-         swapon /var/swap
-         free -m
+         sudo dd if=/dev/zero of=/var/swap bs=1G count=32
+         sudo mkswap /var/swap
+         sudo swapon /var/swap
+         sudo free -m
 
       - name: Install repo tool
         run: |
